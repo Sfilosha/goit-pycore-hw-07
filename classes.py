@@ -40,10 +40,11 @@ class Record:
         self.phones.append(Phone(number))
 
     def remove_phone(self, number: str):
-        # self.phones = list(filter(lambda phone: phone.value != number, self.phones))
-        self.phones = [p for p in self.phones if p.value != number]
-        if not len(self.phones):
-            return f"Phone {number} not found."
+        phone = self.find_phone(number)
+        if phone:
+            self.phones.remove(phone)
+        else:
+            raise ValueError(f"Phone number {number} not found.")
     
     def edit_phone(self, old_number: str, new_number: str):
         old_phone_number = self.find_phone(old_number)
