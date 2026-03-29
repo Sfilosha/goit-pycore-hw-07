@@ -31,6 +31,16 @@ def change_contact(args, book: AddressBook):
         return f"Contact '{name}' updated."
     else: 
         return f"Contact '{name}' not found."
+    
+@logger.input_error
+def remove_phone(args, book: AddressBook):
+    name, number = args
+    contact = book.find(name)
+    if contact:
+        contact.remove_phone(number)
+        return f"Phone of '{name}' removed."
+    else: 
+        return f"Phone of '{name}' not found."
 
 @logger.input_error
 def show_phone(args, book: AddressBook):
@@ -57,7 +67,8 @@ def show_commands():
         "See all contacts": "all",
         "Add Birthday": "add-birthday <username> <DD.MM.YYYY>",
         "Check User's Birthday": "show-birthday <username>",
-        "Upcoming birthdays (next 7 days)": "birthdays"
+        "Upcoming birthdays (next 7 days)": "birthdays",
+        "Remove phone": "remove-phone <username> <phone>"
     }
     print("    List of available commands:")
     for purpose, command in text.items():
@@ -113,6 +124,8 @@ def main():
             print(show_birthday(args, contacts))
         elif command == "birthdays":
             print(birthdays(contacts))
+        elif command == "remove-phone":
+            print(remove_phone(args, contacts))
         elif command == "help":
             show_commands()
         else:

@@ -1,18 +1,16 @@
 from collections import UserDict
-from dataclasses import dataclass, field
 from datetime import datetime, timedelta
 
-@dataclass
+
 class Field:
-    value: any
+    def __init__(self, value: str):
+        self.value = value
 
     def __str__(self):
         return str(self.value)
 
 class Name(Field):
-    def __init__(self, value: str):
-        self.name = value
-        super().__init__(value)
+    pass
 
 class Phone(Field):
     def __init__(self, value: str):
@@ -29,8 +27,8 @@ class Birthday(Field):
         except ValueError:
             raise ValueError("Invalid date format. Use DD.MM.YYYY")
         
-        def __str__(self):
-            return self.value.strftime("%d.%m.%Y")
+    def __str__(self):
+        return self.value.strftime("%d.%m.%Y")
 
 class Record:
     def __init__(self, name):
@@ -42,21 +40,23 @@ class Record:
         self.phones.append(Phone(number))
 
     def remove_phone(self, number: str):
-        self.phones = list(filter(lambda p: p != number, self.phones))
+        # self.phones = list(filter(lambda phone: phone.value != number, self.phones))
+        self.phones = [p for p in self.phones if p.value != number]
+        if not len(self.phones):
+            return f"Phone {number} not found."
     
     def edit_phone(self, old_number: str, new_number: str):
-        phone_to_edit = self.find_phone(old_number)
-        if not phone_to_edit:
+        old_phone_number = self.find_phone(old_number)
+        if not old_phone_number:
             raise ValueError(f"Phone number {old_number} not found.")
-        new_phone_obj = Phone(new_number)
-        phone_to_edit.value = new_phone_obj.value
+        new_phone_number = Phone(new_number)
+        old_phone_number.value = new_phone_number.value
     
     def find_phone(self, number: str):
         for phone in self.phones:
             if phone.value == number:
                 return phone
-            else: 
-                raise ValueError(f"{self.name}'s phone number not found.")
+        return None
 
     def add_birthday(self, date: str):
         self.birthday = Birthday(date)
@@ -65,12 +65,10 @@ class Record:
         return f"{self.name} | phones: {'; '.join(p.value for p in self.phones)} | birthday: {self.birthday}"
 
 
-@dataclass
 class AddressBook(UserDict):
-    data: dict[str, str] = field(default_factory=dict)
 
-    def add_record(self, record: Record):
-        self.data[record.name.value] = record
+    def add_record(self, contact: Record):
+        self.data[contact.name.value] = contact
 
     def find(self, name: str) -> Record:
         return self.data.get(name)
@@ -106,10 +104,10 @@ class AddressBook(UserDict):
 
                 upcoming_birthdays.append({
                     "name": contact.name.value,
-                    "congratulation_date": congratulation_date.strftime("%Y.%m.%d")
+                    "congratulation_date": congratulation_date.strftime("%d.%m.%Y")
                 })
 
-            return upcoming_birthdays
+        return upcoming_birthdays
 
 # TESTING 
 if __name__ == "__main__":
